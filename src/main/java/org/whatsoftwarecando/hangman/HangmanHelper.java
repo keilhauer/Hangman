@@ -94,7 +94,7 @@ public class HangmanHelper {
 				System.out.println("No more differentiating allowed characters left. You have to guess:\n"
 						+ wordlist.getRemainingWords());
 			} else {
-				System.out.println(wordlist.getRemainingWords().size() + " verbleibende Wörter: "
+				System.out.println(wordlist.getRemainingWords().size() + " words remaining: "
 						+ ((wordlist.getRemainingWords().size() > 20)
 								? wordlist.getRemainingWords().subList(0, 20) + " ... "
 								: wordlist.getRemainingWords()));
