@@ -24,7 +24,7 @@ public class ClosestToMiddleStrategy implements IGuessingStrategy{
 			}
 			for (char currentChar : charSet) {
 				Integer wordsWithCharacter = statistic.get(currentChar);
-				if (hangManGame.getCharactersAllowedForGuesses().contains(currentChar)) {
+				if (wordsWithCharacter != null) {
 					statistic.put(currentChar, wordsWithCharacter + 1);
 				}
 			}
