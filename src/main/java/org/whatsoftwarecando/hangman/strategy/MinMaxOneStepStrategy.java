@@ -20,12 +20,12 @@ public class MinMaxOneStepStrategy implements IGuessingStrategy {
 			Wordlist wordlist = hangManGame.getWordlist();
 			Wordlist noWordlist = wordlist.copy();
 			noWordlist.addRestriction(currentChar);
-			int noEval = noWordlist.getRemainingWords().size();
-			if (noEval == wordlist.getRemainingWords().size()) {
+			int noCaseLeftOver = noWordlist.getRemainingWords().size();
+			if (noCaseLeftOver == wordlist.getRemainingWords().size()) {
 				continue;
 			}
-			int yesWorstCase = 0;
-			if (noEval < wordlist.getRemainingWords().size() / 2.0) {
+			int yesWorstCaseLeftOver = 0;
+			if (noCaseLeftOver < wordlist.getRemainingWords().size() / 2.0) {
 				Wordlist yesWordlist = wordlist;
 				Map<Set<Integer>, Integer> placesToWordCount = new HashMap<Set<Integer>, Integer>();
 				for (String currentWord : yesWordlist.getRemainingWords()) {
@@ -43,14 +43,14 @@ public class MinMaxOneStepStrategy implements IGuessingStrategy {
 					}
 					valueOfCurrentPlaces++;
 					placesToWordCount.put(currentPlacesSet, valueOfCurrentPlaces);
-					if (valueOfCurrentPlaces > yesWorstCase) {
-						yesWorstCase = valueOfCurrentPlaces;
+					if (valueOfCurrentPlaces > yesWorstCaseLeftOver) {
+						yesWorstCaseLeftOver = valueOfCurrentPlaces;
 					}
 				}
 			}
-			int eval = Math.max(noEval, yesWorstCase);
-			if (eval < bestMinMaxValueForGuess) {
-				bestMinMaxValueForGuess = eval;
+			int maxLeftOver = Math.max(noCaseLeftOver, yesWorstCaseLeftOver);
+			if (maxLeftOver < bestMinMaxValueForGuess) {
+				bestMinMaxValueForGuess = maxLeftOver;
 				bestGuess = currentChar;
 			}
 		}
