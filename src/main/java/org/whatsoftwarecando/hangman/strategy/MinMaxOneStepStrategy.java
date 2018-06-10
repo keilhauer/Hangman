@@ -18,35 +18,13 @@ public class MinMaxOneStepStrategy implements IGuessingStrategy {
 
 		for (char currentChar : hangManGame.getCharactersAllowedForGuesses()) {
 			Wordlist wordlist = hangManGame.getWordlist();
-			Wordlist noWordlist = wordlist.copy();
-			noWordlist.addRestriction(currentChar);
-			int noCaseLeftOver = noWordlist.getRemainingWords().size();
+			int noCaseLeftOver = calculateNoCaseLeftOver(currentChar, wordlist);
 			if (noCaseLeftOver == wordlist.getRemainingWords().size()) {
 				continue;
 			}
 			int yesWorstCaseLeftOver = 0;
 			if (noCaseLeftOver < wordlist.getRemainingWords().size() / 2.0) {
-				Wordlist yesWordlist = wordlist;
-				Map<Set<Integer>, Integer> placesToWordCount = new HashMap<Set<Integer>, Integer>();
-				for (String currentWord : yesWordlist.getRemainingWords()) {
-					int currentPlace = 1;
-					Set<Integer> currentPlacesSet = new HashSet<Integer>();
-					for (char currentWordChar : currentWord.toCharArray()) {
-						if (currentWordChar == currentChar) {
-							currentPlacesSet.add(currentPlace);
-						}
-						currentPlace++;
-					}
-					Integer valueOfCurrentPlaces = placesToWordCount.get(currentPlacesSet);
-					if (valueOfCurrentPlaces == null) {
-						valueOfCurrentPlaces = 0;
-					}
-					valueOfCurrentPlaces++;
-					placesToWordCount.put(currentPlacesSet, valueOfCurrentPlaces);
-					if (valueOfCurrentPlaces > yesWorstCaseLeftOver) {
-						yesWorstCaseLeftOver = valueOfCurrentPlaces;
-					}
-				}
+				yesWorstCaseLeftOver = calculateYesWorstCaseLeftOver(currentChar, wordlist, yesWorstCaseLeftOver);
 			}
 			int maxLeftOver = Math.max(noCaseLeftOver, yesWorstCaseLeftOver);
 			if (maxLeftOver < bestMinMaxValueForGuess) {
@@ -56,6 +34,37 @@ public class MinMaxOneStepStrategy implements IGuessingStrategy {
 		}
 
 		return bestGuess;
+	}
+
+	private int calculateNoCaseLeftOver(char currentChar, Wordlist wordlist) {
+		Wordlist noWordlist = wordlist.copy();
+		noWordlist.addRestriction(currentChar);
+		int noCaseLeftOver = noWordlist.getRemainingWords().size();
+		return noCaseLeftOver;
+	}
+
+	private int calculateYesWorstCaseLeftOver(char currentChar, Wordlist wordlist, int yesWorstCaseLeftOver) {
+		Map<Set<Integer>, Integer> placesToWordCount = new HashMap<Set<Integer>, Integer>();
+		for (String currentWord : wordlist.getRemainingWords()) {
+			int currentPlace = 1;
+			Set<Integer> currentPlacesSet = new HashSet<Integer>();
+			for (char currentWordChar : currentWord.toCharArray()) {
+				if (currentWordChar == currentChar) {
+					currentPlacesSet.add(currentPlace);
+				}
+				currentPlace++;
+			}
+			Integer valueOfCurrentPlaces = placesToWordCount.get(currentPlacesSet);
+			if (valueOfCurrentPlaces == null) {
+				valueOfCurrentPlaces = 0;
+			}
+			valueOfCurrentPlaces++;
+			placesToWordCount.put(currentPlacesSet, valueOfCurrentPlaces);
+			if (valueOfCurrentPlaces > yesWorstCaseLeftOver) {
+				yesWorstCaseLeftOver = valueOfCurrentPlaces;
+			}
+		}
+		return yesWorstCaseLeftOver;
 	}
 
 }
