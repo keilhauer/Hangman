@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.whatsoftwarecando.hangman.HangmanGame;
 import org.whatsoftwarecando.hangman.IGuessingStrategy;
 
-import java.util.Set;
+public class ClosestToMiddleStrategy implements IGuessingStrategy {
 
-public class ClosestToMiddleStrategy implements IGuessingStrategy{
-
+	@Override
 	public Character bestGuess(HangmanGame hangManGame) {
 		Map<Character, Integer> statistic = new HashMap<Character, Integer>();
 		for (char currentChar : hangManGame.getCharactersAllowedForGuesses()) {
@@ -43,7 +43,7 @@ public class ClosestToMiddleStrategy implements IGuessingStrategy{
 				closestToMiddle = eval;
 			}
 		}
-		if(closestToMiddle >= middleTimesTwo){
+		if (closestToMiddle >= middleTimesTwo) {
 			return null;
 		}
 		return bestChar;

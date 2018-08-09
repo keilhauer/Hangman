@@ -10,7 +10,7 @@ public class HangmanGame {
 	private Wordlist wordlist;
 
 	private IGuessingStrategy buestGuessStrategy;
-	
+
 	public HangmanGame(Wordlist wordlist, String allowedCharactersForGuesses, IGuessingStrategy bestGuessStrategy) {
 		this.wordlist = wordlist;
 		this.charactersAllowedForGuesses = new HashSet<Character>();
@@ -23,7 +23,7 @@ public class HangmanGame {
 	public Character bestGuess() {
 		return buestGuessStrategy.bestGuess(this);
 	}
-	
+
 	public Wordlist getWordlist() {
 		return wordlist;
 	}
@@ -31,8 +31,8 @@ public class HangmanGame {
 	public Set<Character> getCharactersAllowedForGuesses() {
 		return charactersAllowedForGuesses;
 	}
-	
-	public void addRestriction(char ch, int... places){
+
+	public void addRestriction(char ch, int... places) {
 		charactersAllowedForGuesses.remove(ch);
 		wordlist.addRestriction(ch, places);
 	}

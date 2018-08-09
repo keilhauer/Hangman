@@ -21,7 +21,7 @@ public class Wordlist {
 				int lengthOfWord = word.length();
 				if (lengthOfWord > 0 && lengthOfWord == lengthOfWords) {
 					setOfWords.add(word);
-					if (setOfWords.size() % 10000 == 0) {
+					if (setOfWords.size() % 1000 == 0) {
 						System.out.print(".");
 					}
 				}
@@ -31,10 +31,10 @@ public class Wordlist {
 		this.remainingWords = new LinkedList<String>(setOfWords);
 	}
 
-	private Wordlist(List<String> words){
+	private Wordlist(List<String> words) {
 		this.remainingWords = words;
 	}
-	
+
 	public void addRestriction(char ch, int... places) {
 		Set<Integer> placesSet = new HashSet<Integer>();
 		for (int place : places) {
@@ -64,7 +64,7 @@ public class Wordlist {
 		return remainingWords;
 	}
 
-	public Wordlist copy(){
+	public Wordlist copy() {
 		return new Wordlist(new LinkedList<String>(remainingWords));
 	}
 }
