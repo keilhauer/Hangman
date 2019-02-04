@@ -9,7 +9,7 @@ import org.whatsoftwarecando.hangman.HangmanGame;
 import org.whatsoftwarecando.hangman.IGuessingStrategy;
 import org.whatsoftwarecando.hangman.Wordlist;
 
-public class MinMaxOneStepStrategy implements IGuessingStrategy {
+public class MiniMaxOneStepStrategy implements IGuessingStrategy {
 
 	@Override
 	public Character bestGuess(HangmanGame hangManGame) {

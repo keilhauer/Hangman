@@ -3,7 +3,7 @@ package org.whatsoftwarecando.hangman;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import org.whatsoftwarecando.hangman.strategy.MinMaxOneStepStrategy;
+import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepStrategy;
 
 public class HangmanHelper {
 
@@ -48,7 +48,7 @@ public class HangmanHelper {
 		System.out.print("Loading word list with " + anzahlBuchstaben + " letters...");
 		Wordlist wordlist = new Wordlist(HangmanHelper.class.getResourceAsStream(wordlistFilename), anzahlBuchstaben);
 
-		HangmanGame hangmanGame = new HangmanGame(wordlist, allowedCharactersForGuesses, new MinMaxOneStepStrategy());
+		HangmanGame hangmanGame = new HangmanGame(wordlist, allowedCharactersForGuesses, new MiniMaxOneStepStrategy());
 		System.out
 				.println("\n" + wordlist.getRemainingWords().size() + " words with " + anzahlBuchstaben
 						+ " letters loaded.");
