@@ -3,8 +3,20 @@ package org.whatsoftwarecando.hangman;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import org.whatsoftwarecando.hangman.strategy.MaximumSuccessProbabilityStrategy;
+import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepStrategy;
 
+/**
+ * Interactive helper for the guessing side of a real Hangman game: after each
+ * round the player enters the word-giver's answer (the guessed letter followed
+ * by its 1-based positions, or the letter alone for a miss), and the helper
+ * narrows the candidate word list and suggests the next guess using the greedy
+ * {@link MiniMaxOneStepStrategy}.
+ *
+ * Expects two arguments: the name of a word list resource (see the
+ * {@code .launch} files in the project root) and the characters that may be
+ * guessed. The word length is asked for interactively at the start of each
+ * game. Counterpart of {@link PlayHangman}, which plays the word-giver's side.
+ */
 public class HangmanHelper {
 
 	static final String CHARACTER_INPUT_HELP_TEXT = "Please enter a character followed by the positions where it occurs\n"
@@ -22,7 +34,7 @@ public class HangmanHelper {
 				String allowedCharacters = argv[1];
 				System.out.println(emphasized("New Game\nFile name of wordlist: " + wordlistFilename
 						+ "\nAllowed characters for guesses: " + allowedCharacters));
-				einSpiel(input, wordlistFilename, allowedCharacters);
+				helpForOneGame(input, wordlistFilename, allowedCharacters);
 				System.out.println("Play again? [y] for yes");
 
 				String nochmal = input.nextLine();
@@ -34,7 +46,7 @@ public class HangmanHelper {
 		}
 	}
 
-	private static void einSpiel(Scanner input, String wordlistFilename, String allowedCharactersForGuesses) {
+	private static void helpForOneGame(Scanner input, String wordlistFilename, String allowedCharactersForGuesses) {
 
 		System.out.print("How many characters does the word have? ");
 		Integer anzahlBuchstaben = null;
@@ -49,7 +61,7 @@ public class HangmanHelper {
 		Wordlist wordlist = new Wordlist(HangmanHelper.class.getResourceAsStream(wordlistFilename), anzahlBuchstaben);
 
 		HangmanGame hangmanGame = new HangmanGame(wordlist, allowedCharactersForGuesses,
-				new MaximumSuccessProbabilityStrategy());
+				new MiniMaxOneStepStrategy());
 		System.out
 				.println("\n" + wordlist.getRemainingWords().size() + " words with " + anzahlBuchstaben
 						+ " letters loaded.");
@@ -84,7 +96,7 @@ public class HangmanHelper {
 
 	}
 
-	private static String emphasized(String output) {
+	static String emphasized(String output) {
 		StringTokenizer st = new StringTokenizer(output, "\n");
 		int longestLine = 0;
 		while (st.hasMoreTokens()) {

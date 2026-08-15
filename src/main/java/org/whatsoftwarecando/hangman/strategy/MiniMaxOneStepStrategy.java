@@ -36,6 +36,16 @@ public class MiniMaxOneStepStrategy implements IGuessingStrategy {
 		return bestGuess;
 	}
 
+	/**
+	 * Size of the biggest block of words that can remain after guessing the
+	 * given character - the criterion this strategy minimizes.
+	 */
+	public int biggestBlockAfterGuess(char guess, Wordlist wordlist) {
+		int noCaseLeftOver = calculateNoCaseLeftOver(guess, wordlist);
+		int yesWorstCaseLeftOver = calculateYesWorstCaseLeftOver(guess, wordlist, 0);
+		return Math.max(noCaseLeftOver, yesWorstCaseLeftOver);
+	}
+
 	private int calculateNoCaseLeftOver(char currentChar, Wordlist wordlist) {
 		Wordlist noWordlist = wordlist.copy();
 		noWordlist.addRestriction(currentChar);
