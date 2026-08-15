@@ -69,6 +69,7 @@ public class HangmanHelper {
 		System.out.println(emphasized(CHARACTER_INPUT_HELP_TEXT));
 		int nrOfGuess = 1;
 		while (true) {
+			System.out.print("Calculating best guess...");
 			doBestGuess(wordlist, hangmanGame);
 			System.out.print("Guess " + nrOfGuess + ": ");
 			String nextInput = input.nextLine();
@@ -113,7 +114,9 @@ public class HangmanHelper {
 	}
 
 	private static Character doBestGuess(Wordlist wordlist, HangmanGame hangmanGame) {
+		long startTime = System.currentTimeMillis();
 		Character bestGuess = hangmanGame.bestGuess();
+		System.out.println(" [ " + (System.currentTimeMillis() - startTime) + "ms ]");
 		if (bestGuess == null) {
 			System.out.println("No more differentiating allowed characters left. You have to guess:\n"
 					+ wordlist.getRemainingWords());
