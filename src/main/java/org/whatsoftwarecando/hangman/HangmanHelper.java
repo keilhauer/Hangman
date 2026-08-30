@@ -138,7 +138,7 @@ public class HangmanHelper {
 			if (parts[0].length() != 1) {
 				throw new RuntimeException(CHARACTER_INPUT_HELP_TEXT);
 			}
-			currentChar = new Character(parts[0].charAt(0));
+			currentChar = Character.valueOf(parts[0].charAt(0));
 			try {
 				places = new int[parts.length - 1];
 				for (int i = 0; i < places.length; i++) {
