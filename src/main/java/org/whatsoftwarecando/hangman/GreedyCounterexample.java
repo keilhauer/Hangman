@@ -20,17 +20,17 @@ import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepStrategy;
  * For every informative first guess it prints the greedy criterion (the size
  * of the biggest block of words that can remain) and the number of misses the
  * word-giver can force if the game is played perfectly afterwards. With the
- * four words radials/radians/radiant/radiate the risk-averse one-step greedy
- * picks n and loses with two forced misses, while s wins with only one forced
- * miss - even though n and s look identical one guess ahead (each splits into a
- * hit block of two and a miss block of two). That is exactly why a one-step
- * look-ahead cannot tell them apart: only playing on reveals that after s the
- * remaining pairs can be separated without another miss, whereas after n they
- * cannot.
+ * five words cheap/cheat/chefs/chess/chest the risk-averse one-step greedy
+ * picks s - the letter with the smallest miss block, i.e. the "safest" guess -
+ * and loses with two forced misses, while the riskier a wins with only one
+ * forced miss. This is the point of the article: playing safe one guess ahead
+ * is not the same as optimal play. After the s-miss the pair cheap/cheat still
+ * differs only in its last letter, forcing a second miss; after the a-miss the
+ * words chefs/chess/chest are all separated by a single s with no further miss.
  */
 public class GreedyCounterexample {
 
-	public static final List<String> WORDS = Arrays.asList("radials", "radians", "radiant", "radiate");
+	public static final List<String> WORDS = Arrays.asList("cheap", "cheat", "chefs", "chess", "chest");
 
 	/**
 	 * Prints the counterexample table. Output is English by default; pass a
