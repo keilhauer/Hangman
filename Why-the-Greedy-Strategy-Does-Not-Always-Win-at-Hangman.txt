@@ -117,7 +117,7 @@
 <!-- /wp:table -->
 
 <!-- wp:paragraph -->
-<p>Remarkable here is what does <em>not</em> decide the difficulty: the size of the word list. At 88865 words the German nine-letter list is a good four times as long as the seven-letter one, yet the game does not get harder – it gets markedly easier. What counts is the word length: the longer the words, the more positions a hit reveals and the more finely the list falls apart. Four times as many words cost the guesser only two extra bits of information – which a single good letter hands straight back.</p>
+<p>Remarkable here is what does <em>not</em> decide the difficulty: the size of the word list. At 88865 words the German nine-letter list is a good four times as long as the seven-letter one, yet the game does not get harder – it gets markedly easier. What counts is the word length: the longer the words, the more positions a hit reveals and the more finely the list falls apart.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->

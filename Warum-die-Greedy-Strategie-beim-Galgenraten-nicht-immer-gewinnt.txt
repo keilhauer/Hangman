@@ -117,7 +117,7 @@
 <!-- /wp:table -->
 
 <!-- wp:paragraph -->
-<p>Bemerkenswert ist dabei, was <em>nicht</em> über die Schwierigkeit entscheidet: die Größe der Wortliste. Die deutsche Neuner-Liste ist mit 88865 Wörtern gut viermal so lang wie die Siebener-Liste, das Spiel wird dadurch aber nicht schwerer, sondern deutlich leichter. Entscheidend ist die Wortlänge: Je länger die Wörter, desto mehr Positionen deckt ein Treffer auf und desto feiner zerfällt die Liste. Vier Mal so viele Wörter kosten den Ratenden nur zwei zusätzliche Bit an Information – die bekommt er mit einem einzigen guten Buchstaben zurück.</p>
+<p>Bemerkenswert ist dabei, was <em>nicht</em> über die Schwierigkeit entscheidet: die Größe der Wortliste. Die deutsche Neuner-Liste ist mit 88865 Wörtern gut viermal so lang wie die Siebener-Liste, das Spiel wird dadurch aber nicht schwerer, sondern deutlich leichter. Entscheidend ist die Wortlänge: Je länger die Wörter, desto mehr Positionen deckt ein Treffer auf und desto feiner zerfällt die Liste.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
