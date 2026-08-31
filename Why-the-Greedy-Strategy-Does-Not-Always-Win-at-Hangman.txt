@@ -1,0 +1,183 @@
+<!-- wp:paragraph -->
+<p><strong>Hangman looks deceptively simple: guess a few letters, avoid wrong guesses where you can, win. But whoever wants to win every single time quickly runs into hard computer science. This post presents the common greedy strategy, refutes it with a compact five-word example, and explains why a perfect strategy is NP-hard.</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->
+
+<!-- wp:paragraph -->
+<p>A reminder of the rules: the word-giver secretly picks a word from a word list that both players know. The guesser names letters and loses a life for each wrong guess. On a hit, all positions of the letter are revealed – a detail that is easily overlooked but, as we will soon see, provides valuable information.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">The greedy strategy</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>How do you choose a good letter? We assume we have a word list of all possible words (e.g. all words of the English language based on a dictionary, or all words occurring in the English Wikipedia). The obvious idea: mentally try out every letter not yet guessed. For each such letter you look at all the words that are still possible and compute the word list that does not contain the letter, as well as the word lists that contain the letter at the various positions. In what follows we call these word lists blocks.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Two key figures lend themselves to the evaluation. The <strong>biggest block</strong> says how many words are, in the worst case, still lumped together – the smaller it is, the more you learn. The <strong>miss block</strong> is the list of words without the letter; it says how risky the move is. If it is empty, the letter occurs in all remaining words and cannot cost a life.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>From this, three natural strategies arise: minimize only the biggest block; minimize the biggest block and, in case of a tie, take the safer letter; or, conversely, go for safety first and bring in block size only for equally safe letters. All three are in my little Hangman project on GitHub as <code>MiniMaxOneStepSizeReductionStrategy</code>, <code>MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy</code> and <code>MiniMaxOneStepSafetyStrategy</code>. They share the same procedure and differ only in two methods: how a move is scored and how ties are resolved.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>This is a classic greedy algorithm: at every move it does the locally best thing without thinking further ahead. To be technically precise, one could also call it one-step minimax, since a minimax really is computed – but only one level deep in the search tree. On real dictionaries it performs excellently, as we will see with numbers in a moment. It is not an optimal strategy nonetheless.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>When is a strategy actually good? The usual measure is the forced misses: the number of wrong guesses the guesser must accept in the worst case if they play perfectly from now on – that is, when the word-giver has, of all things, the word on the list most malicious for the guesser on their notepad. The smaller this number, the better the strategy; and whoever keeps it below their stock of lives wins for sure. It is worth noting that none of the three variants computes this number. They only evaluate the next move and hope that a good game will come of it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">A counterexample to the greedy strategy's optimality</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>To refute the optimality of the greedy strategy, we construct a simple counterexample. For it, both players agree on the following word list of five English words:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>cheap   cheat   chefs   chess   chest</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>The guesser has one life left and may therefore afford exactly one more wrong guess. They do the math: the letter s is missing in only two of the five words (cheap and cheat), so it is the safest move. Every other letter goes wrong in at least three cases: a is missing in chefs, chess and chest; t in cheap, chefs and chess; f and p in four words each. Incidentally, s is also the letter that splits the list most finely – it cleanly separates chefs, chess and chest owing to their different s-positions. So here the safest and the most informative move coincide, and all three greedy variants choose s.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>And this is exactly where the trap lies. If cheap or cheat is on the word-giver's notepad, s is a miss – the only life is gone. What remains is the pair {cheap, cheat}, which differs only in its last letter: p or t. Whichever of the two the guesser decides on, one of the two words turns it into a miss. So they can only secure themselves against one of the two; for the other, the game is lost.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>And what would the right move have been? Of all letters, a – the letter greedy considers the riskier one, because it is missing in three of the five words:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><strong>a is a hit:</strong> this refers to cheap and cheat, and the same pair as above remains, which costs one wrong guess. But that is still affordable, since the life is still there.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><strong>a is a miss:</strong> this does cost the only life, but chefs, chess and chest remain. All three contain an s – but at different positions (<code>____s</code> vs <code>___ss</code> vs <code>___s_</code>). So asking about s is completely risk-free and separates the three words immediately and fully. Here it pays off that hits reveal their positions.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>So with a the guesser wins for certain, with s they lose for certain. In the language of forced misses: a gets by with one, s allows two – with one remaining life, that is the difference between a certain win and a certain loss. The greedy strategy's ranking is turned literally on its head: its favorite letter leads to defeat, its bottom-ranked one to a certain win. Pretty nasty, isn't it?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Safety isn't everything</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Where did the greedy strategy fail? It evaluates only the next move: the risk of losing a life now, and the size of the blocks that arise now. What is decisive, however, is whether these blocks can even be resolved safely later on.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The pair {cheap, cheat} is a dead end in this respect. The two words differ only in the last letter, and every letter that confirms one word is missing from the other – a wrong guess is unavoidable here. So this pair costs a miss in every case, no matter how cleverly you play on. Whoever, like greedy, names s first pays, on top of that, the miss on s itself and ends up at two.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The three-word block {chefs, chess, chest} is the exact opposite. It is larger, yes, but it subsequently falls apart without any risk, because the shared s stands at a different position in all three words. So once it has arisen it costs nothing more. Whoever opens with a distributes the costs cleverly: on one branch they pay the unavoidable miss of the pair, on the other the miss for a – but never both.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Hangman is, after all, a decision tree, and whoever plays optimally minimizes the wrong guesses along the entire tree, not merely the risk and the block size of the next move. A strategy that looks only one step ahead is, in principle, unable to see these traps.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Does a smarter criterion help?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>At this point an objection is natural: surely the counterexample refutes only this one greedy criterion. Maybe a cleverer one-step formula chooses the right letter?</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The objection is justified, because the three variants are by no means equally good. If you let them compete against every word of a word list (1000 randomly drawn words per word length, each once as the solution), clear differences emerge in the average number of wrong guesses required:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Word list</th><th>size only</th><th>size + risk</th><th>safety first</th></tr></thead><tbody><tr><td>German, 5 letters</td><td>2.98</td><td>2.90</td><td>2.89</td></tr><tr><td>German, 6 letters</td><td>2.11</td><td>2.02</td><td>2.01</td></tr><tr><td>German, 7 letters</td><td>1.55</td><td>1.41</td><td>1.40</td></tr><tr><td>English, 5 letters</td><td>3.07</td><td>2.98</td><td>2.96</td></tr><tr><td>English, 6 letters</td><td>2.14</td><td>2.06</td><td>2.04</td></tr><tr><td>English, 7 letters</td><td>1.65</td><td>1.52</td><td>1.48</td></tr></tbody></table></figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>So taking risk into account at all pays off noticeably, and at the same time it lowers the number of lost games: with five letters and six lives, of 1000 German words 34 fail with pure size reduction, but only 25 with either risk-aware variant; on the English list the number drops from 35 to 31 (size + risk) and 23 (safety first), respectively. On average, by contrast, it hardly matters whether you use risk as the main criterion or only as a tie-break – the table's columns lie only hundredths apart; in the tail of lost games, though, the order can well matter, as the English example shows. On natural dictionaries these are, in any case, quite serious strategies.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:table -->
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Word list</th><th>size only</th><th>size + risk</th><th>safety first</th></tr></thead><tbody><tr><td>German, 5 letters</td><td>34</td><td>25</td><td>25</td></tr><tr><td>German, 6 letters</td><td>5</td><td>2</td><td>1</td></tr><tr><td>German, 7 letters</td><td>0</td><td>0</td><td>0</td></tr><tr><td>English, 5 letters</td><td>35</td><td>31</td><td>23</td></tr><tr><td>English, 6 letters</td><td>3</td><td>2</td><td>2</td></tr><tr><td>English, 7 letters</td><td>0</td><td>0</td><td>0</td></tr></tbody></table><figcaption class="wp-element-caption">Lost games out of 1000 with six lives.</figcaption></figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph -->
+<p>And yet: on our five words all three reach for the same losing s. The two other usual suspects change nothing about that either. Whoever minimizes the expected remaining block size arrives at 1.4 words for s and at least 2.6 for all others. And whoever goes by the greatest information gain – i.e. the criterion that maximizes the entropy of the split – gets the same result, because s splits the list most finely. This is no accident: all these criteria evaluate only how the word list falls apart now, and none asks whether the resulting blocks can still be resolved safely later.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>But that wasn't all. One can show that no efficient rule solves this problem at all, no matter how sophisticated. The argument is pleasantly short: every greedy heuristic – and every fixed-depth lookahead too – is a deterministic procedure with polynomial running time. For such a procedure its worst case can itself be computed efficiently: you simply simulate the game once for every word of the list and count the wrong guesses. So if there were an efficient strategy that always plays optimally, you could use it to decide efficiently whether a win with a given number of wrong guesses can be guaranteed. But exactly this question is NP-hard, as we will see shortly. Under the usual assumption P ≠ NP there can therefore be no always-perfect greedy rule. Our counterexample shows this for concrete greedy strategies and thereby finishes them off for good, because against the claim "greedy always wins" a single word list suffices. What it cannot do is make a statement about rules nobody has written down yet. That is exactly where complexity theory comes in: it hits all efficient procedures at once.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>In fairness: this holds for the worst-case guarantee over all possible word lists. On a concrete dictionary a greedy strategy may well be optimal, and on average it often nearly is – the table above shows just how well it does there. You just can't promise anything.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">NP-hard – the theoretical background</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image {"id":4707,"sizeSlug":"full","linkDestination":"none"} -->
+<figure class="wp-block-image size-full"><img src="https://whatsoftwarecando.org/wp-content/uploads/2025/06/NewFeaturedImage2.jpg" alt="" class="wp-image-4707"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>Where does the NP-hardness come from? Jérémy Barbay and Bernardo Subercaseaux studied the Evil Hangman variant [1]: there the word-giver may change the word mid-game, as long as their previous answers stay consistent. Against a deterministic guesser this is, by the way, no additional advantage at all – what the evil word-giver achieves by cheating, an honest one achieves just as well by choosing the most unfavorable word from the outset. The worst-case question is the same in both game variants.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Their main result: deciding whether the word-giver can force a certain number of wrong guesses is coNP-hard. This already holds for finite word lists with word length 4. From the guesser's point of view this is equivalent to the question "Is there a strategy that surely guesses every word with fewer than d wrong guesses?" being NP-hard. The proof reduces the dominating set problem on 3-regular graphs to Hangman: each node of the graph becomes a letter, and for each node a four-letter word is formed from its own letter and those of its three neighbors. A dominating set of size at most d then exists if and only if the guesser always wins with at most d − 1 misses: they query the d letters of the dominating set, at least one must hit, and a single hit already identifies the word uniquely thanks to the construction.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Conclusion</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The greedy strategy is a brilliant quick shot: lightning-fast, strong on natural dictionaries, but without a guarantee of optimality, because a cunning word-giver can pick the word based on a given word list so cleverly that a given greedy strategy fails. We showed this with an example that dispatches all three variants at once. Complexity theory further shows that full perfection requires an exponential search. For home use, though, this is no drama: with six lives a risk-aware one-step strategy wins over 97 percent of games even for short words, and from seven letters on it practically never loses.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">For checking and playing along</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Whoever doesn't trust the counterexample (quite rightly – trust is good, brute force is better) will find everything to verify in my Hangman project on GitHub (Java, open source). The opponents of this article face off there as classes: the three one-step variants derive from <code>MiniMaxOneStepStrategy</code>, <code>BruteForceMiniMaxStrategy</code> uses the same procedure but replaces the one-step evaluation with the full game depth – with exponential running time, of course, but on five words in milliseconds. The class <code>GreedyCounterexample</code> sets both sides loose on this article's word list and, for each first letter, prints greedy's criterion as well as the misses the word-giver can force:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>a: biggest block 3, forced misses 1
+f: biggest block 4, forced misses 2
+p: biggest block 4, forced misses 2
+s: biggest block 2, forced misses 2
+t: biggest block 3, forced misses 2
+Greedy (one-step minimax) chooses: s
+Brute-force minimax chooses: a</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>The output confirms it: s is the safest and finest move, but loses; a is riskier and wins. Whoever prefers to play rather than compute: the <code>HangmanHelper</code> prompts during a real game against human word-givers (German and English word lists are included, on request also in a "consonants only" mode), and <code>PlayHangman</code> takes the other side. In practice you almost always win with the helper, but you can't guarantee it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">References</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>[1]</strong> Jérémy Barbay and Bernardo Subercaseaux. The Computational Complexity of Evil Hangman. In 10th International Conference on Fun with Algorithms (FUN 2021). Leibniz International Proceedings in Informatics (LIPIcs), Volume 157, pp. 23:1-23:12, Schloss Dagstuhl – Leibniz-Zentrum für Informatik (2020) <a href="https://doi.org/10.4230/LIPIcs.FUN.2021.23">https://doi.org/10.4230/LIPIcs.FUN.2021.23</a></p>
+<!-- /wp:paragraph -->
