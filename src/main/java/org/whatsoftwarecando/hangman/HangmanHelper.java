@@ -68,26 +68,32 @@ public class HangmanHelper {
 
 		System.out.println(emphasized(CHARACTER_INPUT_HELP_TEXT));
 		int nrOfGuess = 1;
+		int misses = 0;
 		while (true) {
 			System.out.print("Calculating best guess...");
 			doBestGuess(wordlist, hangmanGame);
-			System.out.print("Guess " + nrOfGuess + ": ");
+			System.out.print("Guess " + nrOfGuess + " (" + misses + " misses so far): ");
 			String nextInput = input.nextLine();
 
 			if (nextInput.equals(".")) {
 				System.out.println("The following words are left: " + wordlist.getRemainingWords());
+				System.out.println(emphasized("Game aborted after " + nrOfGuess + " guesses with " + misses + " misses"));
 				break;
 			} else {
-				boolean successfulMove = oneMove(hangmanGame, nextInput);
-				if (!successfulMove) {
+				MoveResult moveResult = oneMove(hangmanGame, nextInput);
+				if (moveResult == MoveResult.INVALID) {
 					continue;
+				}
+				if (moveResult == MoveResult.MISS) {
+					misses++;
 				}
 				if (wordlist.getRemainingWords().size() < 2) {
 					if (wordlist.getRemainingWords().size() == 1) {
-						System.out.println(emphasized("Solution found after " + nrOfGuess + " guesses: "
-								+ wordlist.getRemainingWords().get(0)));
+						System.out.println(emphasized("Solution found after " + nrOfGuess + " guesses with " + misses
+								+ " misses: " + wordlist.getRemainingWords().get(0)));
 					} else {
-						System.out.println(emphasized("The solution is not contained in the wordlist"));
+						System.out.println(emphasized("The solution is not contained in the wordlist ("
+								+ misses + " misses)"));
 					}
 					break;
 				}
@@ -130,7 +136,7 @@ public class HangmanHelper {
 		return bestGuess;
 	}
 
-	private static boolean oneMove(HangmanGame hangmanGame, String nextInput) {
+	private static MoveResult oneMove(HangmanGame hangmanGame, String nextInput) {
 		Character currentChar = null;
 		int[] places = null;
 		try {
@@ -149,10 +155,19 @@ public class HangmanHelper {
 			}
 		} catch (RuntimeException r) {
 			System.err.println(emphasized(r.getMessage()));
-			return false;
+			return MoveResult.INVALID;
 		}
 
 		hangmanGame.addRestriction(currentChar, places);
-		return true;
+		// no positions means the word-giver reported the letter as absent
+		return places.length == 0 ? MoveResult.MISS : MoveResult.HIT;
+	}
+
+	/**
+	 * Outcome of parsing and applying one word-giver answer: a rejected input,
+	 * a hit (the guessed letter occurs) or a miss (the letter does not occur).
+	 */
+	private enum MoveResult {
+		INVALID, HIT, MISS
 	}
 }
