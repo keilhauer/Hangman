@@ -11,49 +11,49 @@ import org.whatsoftwarecando.hangman.HangmanGame;
 
 /**
  * Pins down the numbers from the blog article "Warum die Greedy-Strategie bei
- * Hangman nicht immer gewinnt": on the six-word counterexample the greedy
- * strategy picks b and the word-giver can force two misses, while the
- * brute-force minimax strategy picks a and wins with at most one miss.
+ * Hangman nicht immer gewinnt": on the counterexample radials/radians/radiant/
+ * radiate the risk-averse one-step greedy strategy picks n and the word-giver
+ * can force two misses, while the brute-force minimax strategy picks s and wins
+ * with at most one miss.
  */
 public class BruteForceMiniMaxStrategyTest {
 
 	private static final List<String> WORDS = GreedyCounterexample.WORDS;
 	private static final Set<Character> LETTERS = GreedyCounterexample.lettersIn(WORDS);
+	private static final String ALLOWED = "adeilnrst";
 
 	@Test
-	public void greedyChoosesB() {
-		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(WORDS), "abcdef",
+	public void greedyChoosesN() {
+		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(WORDS), ALLOWED,
 				new MiniMaxOneStepStrategy());
-		assertEquals(Character.valueOf('b'), game.bestGuess());
+		assertEquals(Character.valueOf('n'), game.bestGuess());
 	}
 
 	@Test
-	public void bruteForceMiniMaxChoosesA() {
-		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(WORDS), "abcdef",
+	public void bruteForceMiniMaxChoosesS() {
+		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(WORDS), ALLOWED,
 				new BruteForceMiniMaxStrategy());
-		assertEquals(Character.valueOf('a'), game.bestGuess());
+		assertEquals(Character.valueOf('s'), game.bestGuess());
 	}
 
 	@Test
 	public void biggestBlocksMatchArticleTable() {
 		MiniMaxOneStepStrategy greedy = new MiniMaxOneStepStrategy();
-		assertEquals(3, greedy.biggestBlockAfterGuess('b', GreedyCounterexample.createWordlist(WORDS)));
-		assertEquals(4, greedy.biggestBlockAfterGuess('a', GreedyCounterexample.createWordlist(WORDS)));
-		assertEquals(4, greedy.biggestBlockAfterGuess('e', GreedyCounterexample.createWordlist(WORDS)));
-		assertEquals(4, greedy.biggestBlockAfterGuess('c', GreedyCounterexample.createWordlist(WORDS)));
-		assertEquals(4, greedy.biggestBlockAfterGuess('d', GreedyCounterexample.createWordlist(WORDS)));
-		assertEquals(4, greedy.biggestBlockAfterGuess('f', GreedyCounterexample.createWordlist(WORDS)));
+		assertEquals(2, greedy.biggestBlockAfterGuess('n', GreedyCounterexample.createWordlist(WORDS)));
+		assertEquals(2, greedy.biggestBlockAfterGuess('s', GreedyCounterexample.createWordlist(WORDS)));
+		assertEquals(2, greedy.biggestBlockAfterGuess('t', GreedyCounterexample.createWordlist(WORDS)));
+		assertEquals(3, greedy.biggestBlockAfterGuess('l', GreedyCounterexample.createWordlist(WORDS)));
+		assertEquals(3, greedy.biggestBlockAfterGuess('e', GreedyCounterexample.createWordlist(WORDS)));
 	}
 
 	@Test
 	public void forcedMissesMatchArticleTable() {
 		BruteForceMiniMaxStrategy bruteForce = new BruteForceMiniMaxStrategy();
-		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'b'));
-		assertEquals(1, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'a'));
-		assertEquals(1, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'e'));
-		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'c'));
-		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'd'));
-		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'f'));
+		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'n'));
+		assertEquals(1, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 's'));
+		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 't'));
+		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'l'));
+		assertEquals(2, bruteForce.forcedMissesAfterGuess(WORDS, LETTERS, 'e'));
 	}
 
 	@Test

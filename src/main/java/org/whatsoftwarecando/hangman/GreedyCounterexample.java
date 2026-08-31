@@ -17,15 +17,20 @@ import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepStrategy;
  * Verifies the counterexample from the blog article "Warum die
  * Greedy-Strategie bei Hangman nicht immer gewinnt" by brute-force minimax.
  *
- * For every possible first guess it prints the greedy criterion (the size of
- * the biggest block of words that can remain) and the number of misses the
- * word-giver can force if the game is played perfectly afterwards. Greedy
- * picks b (biggest block 3) and loses with two forced misses, while a and e
- * (biggest block 4) win with only one forced miss.
+ * For every informative first guess it prints the greedy criterion (the size
+ * of the biggest block of words that can remain) and the number of misses the
+ * word-giver can force if the game is played perfectly afterwards. With the
+ * four words radials/radians/radiant/radiate the risk-averse one-step greedy
+ * picks n and loses with two forced misses, while s wins with only one forced
+ * miss - even though n and s look identical one guess ahead (each splits into a
+ * hit block of two and a miss block of two). That is exactly why a one-step
+ * look-ahead cannot tell them apart: only playing on reveals that after s the
+ * remaining pairs can be separated without another miss, whereas after n they
+ * cannot.
  */
 public class GreedyCounterexample {
 
-	public static final List<String> WORDS = Arrays.asList("abe", "abf", "ade", "aef", "bce", "cde");
+	public static final List<String> WORDS = Arrays.asList("radials", "radians", "radiant", "radiate");
 
 	/**
 	 * Prints the counterexample table. Output is English by default; pass a
@@ -46,6 +51,11 @@ public class GreedyCounterexample {
 
 		for (Character currentChar : letters) {
 			int biggestBlock = greedy.biggestBlockAfterGuess(currentChar, wordlist);
+			if (biggestBlock == WORDS.size()) {
+				// the letter leaves all words in a single block (it occurs in
+				// every word at the same places, or in none): no information
+				continue;
+			}
 			int forcedMisses = bruteForce.forcedMissesAfterGuess(WORDS, letters, currentChar);
 			System.out.println(MessageFormat.format(messages.getString("letterLine"), currentChar, biggestBlock,
 					forcedMisses));
