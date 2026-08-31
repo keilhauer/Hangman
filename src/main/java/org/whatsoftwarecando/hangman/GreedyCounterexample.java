@@ -2,8 +2,11 @@ package org.whatsoftwarecando.hangman;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -24,7 +27,18 @@ public class GreedyCounterexample {
 
 	public static final List<String> WORDS = Arrays.asList("abe", "abf", "ade", "aef", "bce", "cde");
 
+	/**
+	 * Prints the counterexample table. Output is English by default; pass a
+	 * language tag (e.g. {@code de}) as the first argument to print the German
+	 * wording used in the German article. The locale is taken from the argument
+	 * rather than the machine so either article's output is reproducible
+	 * anywhere.
+	 */
 	public static void main(String[] argv) {
+		Locale locale = argv.length > 0 ? Locale.forLanguageTag(argv[0]) : Locale.getDefault();
+		ResourceBundle messages = ResourceBundle.getBundle("org.whatsoftwarecando.hangman.messages", locale,
+				ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_PROPERTIES));
+
 		Set<Character> letters = lettersIn(WORDS);
 		Wordlist wordlist = createWordlist(WORDS);
 		MiniMaxOneStepStrategy greedy = new MiniMaxOneStepStrategy();
@@ -33,15 +47,15 @@ public class GreedyCounterexample {
 		for (Character currentChar : letters) {
 			int biggestBlock = greedy.biggestBlockAfterGuess(currentChar, wordlist);
 			int forcedMisses = bruteForce.forcedMissesAfterGuess(WORDS, letters, currentChar);
-			System.out.println(
-					currentChar + ": größter Block " + biggestBlock + ", erzwingbare Fehlversuche " + forcedMisses);
+			System.out.println(MessageFormat.format(messages.getString("letterLine"), currentChar, biggestBlock,
+					forcedMisses));
 		}
 
 		String allowedCharacters = asString(letters);
 		Character greedyGuess = new HangmanGame(createWordlist(WORDS), allowedCharacters, greedy).bestGuess();
 		Character bruteForceGuess = new HangmanGame(createWordlist(WORDS), allowedCharacters, bruteForce).bestGuess();
-		System.out.println("Greedy (Ein-Zug-Minimax) wählt: " + greedyGuess);
-		System.out.println("Brute-Force-Minimax wählt: " + bruteForceGuess);
+		System.out.println(MessageFormat.format(messages.getString("greedyChoice"), greedyGuess));
+		System.out.println(MessageFormat.format(messages.getString("bruteForceChoice"), bruteForceGuess));
 	}
 
 	public static Wordlist createWordlist(List<String> words) {
