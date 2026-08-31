@@ -27,7 +27,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Das ist ein klassischer Greedy-Algorithmus: In jedem Zug wird lokal das Beste getan, ohne weiter vorauszudenken. Fachlich exakt könnte man es auch Ein-Zug-Minimax nennen, denn es wird durchaus Minimax gerechnet – aber nur eine Ebene des Suchbaums tief. Auf echten Wörterbüchern schlägt sich das hervorragend, wie wir gleich mit Zahlen sehen werden. Eine optimale Strategie ist es trotzdem nicht.</p>
+<p>Das ist ein klassischer Greedy-Algorithmus: In jedem Zug wird lokal das Beste getan, ohne weiter vorauszudenken. Fachlich exakt könnte man es auch Ein-Zug-Minimax nennen, denn es wird durchaus Minimax gerechnet – aber nur eine Ebene des Suchbaums tief. Auf echten Wörterbüchern schlägt sich das gut, wie wir gleich mit Zahlen sehen werden. Eine optimale Strategie ist es trotzdem nicht.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -101,19 +101,19 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Der Einwand ist berechtigt, denn die drei Varianten sind keineswegs gleich gut. Lässt man sie gegen jedes Wort einer Wortliste antreten (1000 zufällig gezogene Wörter je Wortlänge, jedes einmal als Lösung), ergeben sich klare Unterschiede in den durchschnittlich benötigten Fehlversuchen:</p>
+<p>Der Einwand ist berechtigt, denn die drei Varianten sind keineswegs gleich gut. Lässt man sie auf ein vollständiges Wörterbuch los – der Ratende kennt also sämtliche Wörter der jeweiligen Länge, von 4458 deutschen Fünf-Buchstaben-Wörtern bis zu 21045 deutschen Sieben-Buchstaben-Wörtern – und spielt jedes Wort der Liste einmal als Lösung durch, ergeben sich klare Unterschiede in den durchschnittlich benötigten Fehlversuchen:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:table -->
-<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Wortliste</th><th>nur Größe</th><th>Größe + Risiko</th><th>Sicherheit zuerst</th></tr></thead><tbody><tr><td>Deutsch, 5 Buchstaben</td><td>2,98</td><td>2,90</td><td>2,89</td></tr><tr><td>Deutsch, 6 Buchstaben</td><td>2,11</td><td>2,02</td><td>2,01</td></tr><tr><td>Deutsch, 7 Buchstaben</td><td>1,55</td><td>1,41</td><td>1,40</td></tr><tr><td>Englisch, 5 Buchstaben</td><td>3,07</td><td>2,98</td><td>2,96</td></tr><tr><td>Englisch, 6 Buchstaben</td><td>2,14</td><td>2,06</td><td>2,04</td></tr><tr><td>Englisch, 7 Buchstaben</td><td>1,65</td><td>1,52</td><td>1,48</td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Wortliste</th><th>nur Größe</th><th>Größe + Risiko</th><th>Sicherheit zuerst</th></tr></thead><tbody><tr><td>Deutsch, 5 Buchstaben (4458)</td><td>4,24</td><td>4,18</td><td>4,17</td></tr><tr><td>Deutsch, 6 Buchstaben (9597)</td><td>3,43</td><td>3,34</td><td>3,33</td></tr><tr><td>Deutsch, 7 Buchstaben (21045)</td><td>2,85</td><td>2,74</td><td>2,70</td></tr><tr><td>Englisch, 5 Buchstaben (5987)</td><td>4,51</td><td>4,46</td><td>4,44</td></tr><tr><td>Englisch, 6 Buchstaben (9552)</td><td>3,50</td><td>3,42</td><td>3,39</td></tr><tr><td>Englisch, 7 Buchstaben (12837)</td><td>2,83</td><td>2,70</td><td>2,62</td></tr></tbody></table><figcaption class="wp-element-caption">Durchschnittlich benötigte Fehlversuche gegen das vollständige Wörterbuch; in Klammern die Zahl der Wörter, die jeweils einmal als Lösung gespielt wurden.</figcaption></figure>
 <!-- /wp:table -->
 
 <!-- wp:paragraph -->
-<p>Das Risiko überhaupt zu berücksichtigen lohnt sich also spürbar, und es senkt zugleich die Zahl der verlorenen Spiele: Bei fünf Buchstaben und sechs Leben scheitern von 1000 deutschen Wörtern 34 an der reinen Größenreduktion, aber nur 25 an beiden risikobewussten Varianten; auf der englischen Liste sinkt die Zahl von 35 auf 31 (Größe + Risiko) bzw. 23 (Sicherheit zuerst). Im Durchschnitt macht es dagegen kaum einen Unterschied, ob man das Risiko als Hauptkriterium oder nur als Tie-Break verwendet – die Spalten der Tabelle liegen jeweils nur Hundertstel auseinander; im Randbereich der verlorenen Spiele kann die Reihenfolge aber sehr wohl zählen, wie das englische Beispiel zeigt. Auf natürlichen Wörterbüchern sind das jedenfalls durchaus ernstzunehmende Strategien.</p>
+<p>Das Risiko überhaupt zu berücksichtigen lohnt sich also, wenn auch nicht dramatisch, und es senkt zugleich die Zahl der verlorenen Spiele: Bei fünf Buchstaben und sechs Leben fällt die Verlustquote nur von 16,0 auf 15,1 Prozent (Deutsch) bzw. von 18,4 auf 17,4 Prozent (Englisch). Mit wachsender Wortlänge wird der Abstand deutlicher, und dort zählt auch die Reihenfolge der Kriterien: Bei deutschen Sieben-Buchstaben-Wörtern verliert die reine Größenreduktion 2,0 Prozent der Spiele, die Tie-Break-Variante 1,4 Prozent und diejenige, die zuerst auf Sicherheit geht, nur 1,2 Prozent – zusammen also gut ein Drittel weniger. Im Durchschnitt sind die Unterschiede dagegen klein: Zwischen den beiden risikobewussten Varianten liegen nur wenige Hundertstel. Auf natürlichen Wörterbüchern sind das jedenfalls durchaus ernstzunehmende Strategien.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:table -->
-<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Wortliste</th><th>nur Größe</th><th>Größe + Risiko</th><th>Sicherheit zuerst</th></tr></thead><tbody><tr><td>Deutsch, 5 Buchstaben</td><td>34</td><td>25</td><td>25</td></tr><tr><td>Deutsch, 6 Buchstaben</td><td>5</td><td>2</td><td>1</td></tr><tr><td>Deutsch, 7 Buchstaben</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Englisch, 5 Buchstaben</td><td>35</td><td>31</td><td>23</td></tr><tr><td>Englisch, 6 Buchstaben</td><td>3</td><td>2</td><td>2</td></tr><tr><td>Englisch, 7 Buchstaben</td><td>0</td><td>0</td><td>0</td></tr></tbody></table><figcaption class="wp-element-caption">Verlorene Spiele von 1000 bei sechs Leben.</figcaption></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Wortliste</th><th>nur Größe</th><th>Größe + Risiko</th><th>Sicherheit zuerst</th></tr></thead><tbody><tr><td>Deutsch, 5 Buchstaben</td><td>16,0 %</td><td>15,2 %</td><td>15,1 %</td></tr><tr><td>Deutsch, 6 Buchstaben</td><td>6,6 %</td><td>5,7 %</td><td>5,5 %</td></tr><tr><td>Deutsch, 7 Buchstaben</td><td>2,0 %</td><td>1,4 %</td><td>1,2 %</td></tr><tr><td>Englisch, 5 Buchstaben</td><td>18,4 %</td><td>17,6 %</td><td>17,4 %</td></tr><tr><td>Englisch, 6 Buchstaben</td><td>7,3 %</td><td>6,8 %</td><td>6,2 %</td></tr><tr><td>Englisch, 7 Buchstaben</td><td>3,3 %</td><td>2,9 %</td><td>2,4 %</td></tr></tbody></table><figcaption class="wp-element-caption">Anteil verlorener Spiele bei sechs Leben, gegen das vollständige Wörterbuch.</figcaption></figure>
 <!-- /wp:table -->
 
 <!-- wp:paragraph -->
@@ -149,7 +149,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Die Greedy-Strategie ist ein genialer Schnellschuss: blitzschnell, auf natürlichen Wörterbüchern stark, aber ohne Optimalitäts-Garantie, denn ein raffinierter Wortgeber kann das Wort auf Basis einer gegebenen Wortliste geschickt wählen, sodass eine gegebene Greedy-Strategie fehlschlägt. Das haben wir anhand eines Beispiels gezeigt, das gleich alle drei Varianten auf einmal erledigt. Die Komplexitätstheorie zeigt weiterhin, dass für die volle Perfektion eine exponentielle Suche notwendig ist. Für den Hausgebrauch ist das allerdings kein Drama: Mit sechs Leben gewinnt eine risikobewusste Ein-Zug-Strategie selbst bei kurzen Wörtern über 97 Prozent der Spiele, und ab sieben Buchstaben verliert sie praktisch nie.</p>
+<p>Die Greedy-Strategie ist ein genialer Schnellschuss: blitzschnell, auf natürlichen Wörterbüchern stark, aber ohne Optimalitäts-Garantie, denn ein raffinierter Wortgeber kann das Wort auf Basis einer gegebenen Wortliste geschickt wählen, sodass eine gegebene Greedy-Strategie fehlschlägt. Das haben wir anhand eines Beispiels gezeigt, das gleich alle drei Varianten auf einmal erledigt. Die Komplexitätstheorie zeigt weiterhin, dass für die volle Perfektion eine exponentielle Suche notwendig ist. Für den Hausgebrauch ist das allerdings kein Drama: Mit sechs Leben gewinnt eine risikobewusste Ein-Zug-Strategie gegen das vollständige Wörterbuch je nach Sprache 82 bis 85 Prozent der Spiele bei fünf Buchstaben und 97 bis 99 Prozent bei sieben. Die harte Nuss sind also gerade die kurzen Wörter – dort verrät jeder Treffer am wenigsten.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -157,7 +157,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Wer dem Gegenbeispiel nicht traut (völlig zu Recht – Vertrauen ist gut, Brute-Force ist besser), findet alles zum Nachprüfen in meinem Hangman-Projekt auf GitHub (Java, Open-Source). Die Kontrahenten dieses Artikels stehen sich dort als Klassen gegenüber: Die drei Ein-Zug-Varianten leiten von <code>MiniMaxOneStepStrategy</code> ab, <code>BruteForceMiniMaxStrategy</code> nutzt denselben Ablauf, ersetzt aber die Ein-Zug-Bewertung durch die volle Spieltiefe – mit exponentieller Laufzeit, versteht sich, auf fünf Wörtern aber in Millisekunden. Die Klasse <code>GreedyCounterexample</code> lässt beide Seiten auf die Wortliste dieses Artikels los und gibt für jeden Erstbuchstaben Greedys Kriterium sowie die vom Wortgeber erzwingbaren Fehlversuche aus:</p>
+<p>Wer dem Gegenbeispiel nicht traut (völlig zu Recht – Vertrauen ist gut, Brute-Force ist besser), findet alles zum Nachprüfen in meinem Hangman-Projekt auf GitHub (Java, Open-Source). Die Kontrahenten dieses Artikels stehen sich dort als Klassen gegenüber: Die drei Ein-Zug-Varianten leiten von <code>MiniMaxOneStepStrategy</code> ab, <code>BruteForceMiniMaxStrategy</code> nutzt denselben Ablauf, ersetzt aber die Ein-Zug-Bewertung durch die volle Spieltiefe – mit exponentieller Laufzeit, versteht sich, auf fünf Wörtern aber in Millisekunden. Die Klasse <code>GreedyCounterexample</code> lässt beide Seiten auf die Wortliste dieses Artikels los und gibt für jeden aussagekräftigen Erstbuchstaben Greedys Kriterium sowie die vom Wortgeber erzwingbaren Fehlversuche aus (c, h und e fehlen, weil sie in allen fünf Wörtern an denselben Stellen stehen und daher nichts verraten):</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->

@@ -27,7 +27,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>This is a classic greedy algorithm: at every move it does the locally best thing without thinking further ahead. To be technically precise, one could also call it one-step minimax, since a minimax really is computed – but only one level deep in the search tree. On real dictionaries it performs excellently, as we will see with numbers in a moment. It is not an optimal strategy nonetheless.</p>
+<p>This is a classic greedy algorithm: at every move it does the locally best thing without thinking further ahead. To be technically precise, one could also call it one-step minimax, since a minimax really is computed – but only one level deep in the search tree. On real dictionaries it performs well, as we will see with numbers in a moment. It is not an optimal strategy nonetheless.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -101,19 +101,19 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>The objection is justified, because the three variants are by no means equally good. If you let them compete against every word of a word list (1000 randomly drawn words per word length, each once as the solution), clear differences emerge in the average number of wrong guesses required:</p>
+<p>The objection is justified, because the three variants are by no means equally good. If you set them loose on a complete dictionary – so the guesser knows every word of the respective length, from 4458 German five-letter words up to 21045 German seven-letter words – and play every word of the list once as the solution, clear differences emerge in the average number of wrong guesses required:</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:table -->
-<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Word list</th><th>size only</th><th>size + risk</th><th>safety first</th></tr></thead><tbody><tr><td>German, 5 letters</td><td>2.98</td><td>2.90</td><td>2.89</td></tr><tr><td>German, 6 letters</td><td>2.11</td><td>2.02</td><td>2.01</td></tr><tr><td>German, 7 letters</td><td>1.55</td><td>1.41</td><td>1.40</td></tr><tr><td>English, 5 letters</td><td>3.07</td><td>2.98</td><td>2.96</td></tr><tr><td>English, 6 letters</td><td>2.14</td><td>2.06</td><td>2.04</td></tr><tr><td>English, 7 letters</td><td>1.65</td><td>1.52</td><td>1.48</td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Word list</th><th>size only</th><th>size + risk</th><th>safety first</th></tr></thead><tbody><tr><td>German, 5 letters (4458)</td><td>4.24</td><td>4.18</td><td>4.17</td></tr><tr><td>German, 6 letters (9597)</td><td>3.43</td><td>3.34</td><td>3.33</td></tr><tr><td>German, 7 letters (21045)</td><td>2.85</td><td>2.74</td><td>2.70</td></tr><tr><td>English, 5 letters (5987)</td><td>4.51</td><td>4.46</td><td>4.44</td></tr><tr><td>English, 6 letters (9552)</td><td>3.50</td><td>3.42</td><td>3.39</td></tr><tr><td>English, 7 letters (12837)</td><td>2.83</td><td>2.70</td><td>2.62</td></tr></tbody></table><figcaption class="wp-element-caption">Average wrong guesses needed against the complete dictionary; in brackets the number of words, each played once as the solution.</figcaption></figure>
 <!-- /wp:table -->
 
 <!-- wp:paragraph -->
-<p>So taking risk into account at all pays off noticeably, and at the same time it lowers the number of lost games: with five letters and six lives, of 1000 German words 34 fail with pure size reduction, but only 25 with either risk-aware variant; on the English list the number drops from 35 to 31 (size + risk) and 23 (safety first), respectively. On average, by contrast, it hardly matters whether you use risk as the main criterion or only as a tie-break – the table's columns lie only hundredths apart; in the tail of lost games, though, the order can well matter, as the English example shows. On natural dictionaries these are, in any case, quite serious strategies.</p>
+<p>So taking risk into account at all pays off, if not dramatically, and at the same time it lowers the number of lost games: with five letters and six lives the loss rate falls only from 16.0 to 15.1 percent (German) and from 18.4 to 17.4 percent (English). The gap widens as words get longer, and there the order of the criteria matters too: for German seven-letter words pure size reduction loses 2.0 percent of games, the tie-break variant 1.4 percent, and the one that goes for safety first only 1.2 percent – a good third fewer overall. On average, by contrast, the differences are small: between the two risk-aware variants there are only a few hundredths. On natural dictionaries these are, in any case, quite serious strategies.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:table -->
-<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Word list</th><th>size only</th><th>size + risk</th><th>safety first</th></tr></thead><tbody><tr><td>German, 5 letters</td><td>34</td><td>25</td><td>25</td></tr><tr><td>German, 6 letters</td><td>5</td><td>2</td><td>1</td></tr><tr><td>German, 7 letters</td><td>0</td><td>0</td><td>0</td></tr><tr><td>English, 5 letters</td><td>35</td><td>31</td><td>23</td></tr><tr><td>English, 6 letters</td><td>3</td><td>2</td><td>2</td></tr><tr><td>English, 7 letters</td><td>0</td><td>0</td><td>0</td></tr></tbody></table><figcaption class="wp-element-caption">Lost games out of 1000 with six lives.</figcaption></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Word list</th><th>size only</th><th>size + risk</th><th>safety first</th></tr></thead><tbody><tr><td>German, 5 letters</td><td>16.0 %</td><td>15.2 %</td><td>15.1 %</td></tr><tr><td>German, 6 letters</td><td>6.6 %</td><td>5.7 %</td><td>5.5 %</td></tr><tr><td>German, 7 letters</td><td>2.0 %</td><td>1.4 %</td><td>1.2 %</td></tr><tr><td>English, 5 letters</td><td>18.4 %</td><td>17.6 %</td><td>17.4 %</td></tr><tr><td>English, 6 letters</td><td>7.3 %</td><td>6.8 %</td><td>6.2 %</td></tr><tr><td>English, 7 letters</td><td>3.3 %</td><td>2.9 %</td><td>2.4 %</td></tr></tbody></table><figcaption class="wp-element-caption">Share of lost games with six lives, against the complete dictionary.</figcaption></figure>
 <!-- /wp:table -->
 
 <!-- wp:paragraph -->
@@ -149,7 +149,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The greedy strategy is a brilliant quick shot: lightning-fast, strong on natural dictionaries, but without a guarantee of optimality, because a cunning word-giver can pick the word based on a given word list so cleverly that a given greedy strategy fails. We showed this with an example that dispatches all three variants at once. Complexity theory further shows that full perfection requires an exponential search. For home use, though, this is no drama: with six lives a risk-aware one-step strategy wins over 97 percent of games even for short words, and from seven letters on it practically never loses.</p>
+<p>The greedy strategy is a brilliant quick shot: lightning-fast, strong on natural dictionaries, but without a guarantee of optimality, because a cunning word-giver can pick the word based on a given word list so cleverly that a given greedy strategy fails. We showed this with an example that dispatches all three variants at once. Complexity theory further shows that full perfection requires an exponential search. For home use, though, this is no drama: with six lives a risk-aware one-step strategy wins, against the complete dictionary and depending on the language, 82 to 85 percent of games at five letters and 97 to 99 percent at seven. So the hard nut is precisely the short words – there every hit reveals the least.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -157,7 +157,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Whoever doesn't trust the counterexample (quite rightly – trust is good, brute force is better) will find everything to verify in my Hangman project on GitHub (Java, open source). The opponents of this article face off there as classes: the three one-step variants derive from <code>MiniMaxOneStepStrategy</code>, <code>BruteForceMiniMaxStrategy</code> uses the same procedure but replaces the one-step evaluation with the full game depth – with exponential running time, of course, but on five words in milliseconds. The class <code>GreedyCounterexample</code> sets both sides loose on this article's word list and, for each first letter, prints greedy's criterion as well as the misses the word-giver can force:</p>
+<p>Whoever doesn't trust the counterexample (quite rightly – trust is good, brute force is better) will find everything to verify in my Hangman project on GitHub (Java, open source). The opponents of this article face off there as classes: the three one-step variants derive from <code>MiniMaxOneStepStrategy</code>, <code>BruteForceMiniMaxStrategy</code> uses the same procedure but replaces the one-step evaluation with the full game depth – with exponential running time, of course, but on five words in milliseconds. The class <code>GreedyCounterexample</code> sets both sides loose on this article's word list and, for each informative first letter, prints greedy's criterion as well as the misses the word-giver can force (c, h and e are absent because they sit at the same positions in all five words and therefore reveal nothing):</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->

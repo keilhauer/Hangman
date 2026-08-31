@@ -50,8 +50,6 @@ Tests need a JUnit 4 + Hamcrest jar on the classpath (e.g. from
   - `BruteForceMiniMaxStrategy` — same base/driver, but `scoreGuess` does a
     full game-tree look-ahead: minimizes the worst-case number of forced misses
     (exponential; small word lists only)
-  - `MaximumSuccessProbabilityStrategy` — picks the letter occurring in the
-    most remaining words
 - `GreedyCounterexample` — main that reproduces the article's counterexample
   table for the five words `cheap/cheat/chefs/chess/chest`: the risk-averse
   greedy (`MiniMaxOneStepSafetyStrategy`) plays the "safest" letter `s` and
@@ -60,9 +58,12 @@ Tests need a JUnit 4 + Hamcrest jar on the classpath (e.g. from
   pass `de` as the first arg for the German article). `BruteForceMiniMaxStrategyTest`
   pins its numbers; each greedy strategy also has its own `*Test`
 - `Benchmark` — main that reproduces the article's average-misses and
-  lost-games tables: plays each greedy strategy against a fixed, seeded
-  1000-word sample per word length; the fixed RNG seed keeps the published
-  numbers reproducible
+  lost-games tables. Fully exhaustive: the guesser knows the **whole**
+  dictionary for each word length and **every** word is played once as the
+  secret, so there is no sampling and no RNG seed. It does not simulate one
+  game per word; instead it walks the strategy's decision tree once (a
+  deterministic strategy induces a single tree), which yields every word's miss
+  count at once and runs in seconds rather than minutes
 - Each greedy strategy has a unit test in `strategy/` (shared helper
   `StrategyTestSupport`); the tests use discriminating word sets so a test
   fails if a strategy's criteria or their order are swapped

@@ -1,12 +1,12 @@
 package org.whatsoftwarecando.hangman;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepSafetyStrategy;
@@ -14,100 +14,136 @@ import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepSizeReductionStrateg
 import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy;
 
 /**
- * Reproduces the average-misses table in the blog article. For each bundled
- * word list and word length (5-7) it draws a fixed sample of up to
- * {@value #SAMPLE_SIZE} words and lets each one-step greedy strategy guess every
- * sampled word once, as if it were the word-giver's secret. Per strategy it
- * prints the average and maximum number of misses and how many words are lost
- * with {@value #LIVES} lives (i.e. need more than {@value #LIVES} misses).
+ * Reproduces the average-misses and lost-games tables in the blog article.
  *
- * <p>The sample is drawn by shuffling the matching words with a <em>fixed</em>
- * {@link Random} seed ({@value #SEED}) and truncating, so the published numbers
- * are exactly reproducible. Change the seed only if you intend to publish new
- * numbers.
+ * <p>Everything is measured against the <em>complete</em> bundled dictionary for
+ * each word length: the guesser knows every word of that length, and every word
+ * is played once as the word-giver's secret. There is no sampling and no random
+ * seed, so the numbers are exact and reproducible by construction.
+ *
+ * <p>Rather than simulating one game per word - which would repeat the same
+ * work over and over, since all games start from the same list - it exploits
+ * that a deterministic strategy induces a single decision tree: at each node the
+ * strategy picks one letter, and the word-giver's answer splits the remaining
+ * words into blocks. Walking that tree once yields the exact number of misses
+ * for every word simultaneously, which is orders of magnitude faster than
+ * playing the games individually.
+ *
+ * <p>Per strategy it prints the average and maximum number of misses and how
+ * many words are lost with {@value #LIVES} lives (i.e. need more than
+ * {@value #LIVES} misses).
  */
 public class Benchmark {
 
-	private static final int SEED = 1;
-	private static final int SAMPLE_SIZE = 1000;
 	private static final int LIVES = 6;
 
+	private static final String RESOURCE_PATH = "/org/whatsoftwarecando/hangman/";
 	private static final String[] WORDLIST_RESOURCES = { "word_list_german_uppercase_spell_checked.txt",
 			"word_list_english_uppercase_spell_checked.txt" };
-	private static final String[] WORDLIST_LABELS = { "Deutsch", "Englisch" };
+	private static final String[] WORDLIST_LABELS = { "German", "English" };
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		for (int list = 0; list < WORDLIST_RESOURCES.length; list++) {
 			for (int length = 5; length <= 7; length++) {
-				List<String> sample = sampleWords(WORDLIST_RESOURCES[list], length);
-				System.out.printf("%s, %d Buchstaben (%d Woerter):%n", WORDLIST_LABELS[list], length, sample.size());
-				report("nur Groesse", new MiniMaxOneStepSizeReductionStrategy(), sample);
-				report("Groesse+Risiko", new MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy(), sample);
-				report("Sicherheit", new MiniMaxOneStepSafetyStrategy(), sample);
+				Wordlist dictionary = new Wordlist(
+						Benchmark.class.getResourceAsStream(RESOURCE_PATH + WORDLIST_RESOURCES[list]), length);
+				List<String> words = dictionary.getRemainingWords();
+				Set<Character> letters = lettersIn(words);
+
+				System.out.printf("%n%s, %d letters | %d words%n", WORDLIST_LABELS[list], length, words.size());
+				report("size only", new MiniMaxOneStepSizeReductionStrategy(), words, letters);
+				report("size+risk", new MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy(), words, letters);
+				report("safety", new MiniMaxOneStepSafetyStrategy(), words, letters);
 			}
 		}
 	}
 
-	private static void report(String name, IGuessingStrategy strategy, List<String> sample) {
-		int totalMisses = 0;
+	private static void report(String name, IGuessingStrategy strategy, List<String> words, Set<Character> letters) {
+		Map<String, Integer> missesPerWord = new HashMap<String, Integer>();
+		walk(words, letters, 0, strategy, missesPerWord);
+
+		long totalMisses = 0;
 		int maxMisses = 0;
 		int lost = 0;
-		for (String secret : sample) {
-			int misses = play(secret, sample, strategy);
+		for (String word : words) {
+			int misses = missesPerWord.get(word);
 			totalMisses += misses;
 			maxMisses = Math.max(maxMisses, misses);
 			if (misses > LIVES) {
 				lost++;
 			}
 		}
-		System.out.printf("  %-15s avg %.2f  max %d  lost %d%n", name, (double) totalMisses / sample.size(), maxMisses,
-				lost);
+		System.out.printf("  %-10s avg %.2f  max %d  lost %d of %d  (won %.1f%%)%n", name,
+				(double) totalMisses / words.size(), maxMisses, lost, words.size(),
+				100.0 * (words.size() - lost) / words.size());
 	}
 
 	/**
-	 * Plays one game: {@code strategy} guesses until a single word remains,
-	 * answering truthfully for {@code secret}, and returns the number of misses.
+	 * Walks the strategy's decision tree, recording for every word how many
+	 * misses the guesser accumulates before only that word remains. Mirrors the
+	 * interactive game exactly: the guesser stops once a single candidate is
+	 * left, and a guess counts as a miss when the secret does not contain it.
 	 */
-	private static int play(String secret, List<String> words, IGuessingStrategy strategy) {
-		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(words), allowedLetters(words), strategy);
-		int misses = 0;
-		while (game.getWordlist().getRemainingWords().size() > 1) {
-			Character guess = game.bestGuess();
-			if (guess == null) {
-				// no letter distinguishes the rest; they can only be tried one by one
-				return misses + game.getWordlist().getRemainingWords().size() - 1;
+	private static void walk(List<String> words, Set<Character> allowedCharacters, int missesSoFar,
+			IGuessingStrategy strategy, Map<String, Integer> missesPerWord) {
+		if (words.size() <= 1) {
+			for (String word : words) {
+				missesPerWord.put(word, missesSoFar);
 			}
-			int[] places = positionsOf(guess, secret);
-			if (places.length == 0) {
-				misses++;
-			}
-			game.addRestriction(guess, places);
+			return;
 		}
-		return misses;
+		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(words), asString(allowedCharacters),
+				strategy);
+		Character guess = game.bestGuess();
+		if (guess == null) {
+			// no letter distinguishes the rest; they can only be tried one by one
+			for (String word : words) {
+				missesPerWord.put(word, missesSoFar + words.size() - 1);
+			}
+			return;
+		}
+		Set<Character> remaining = new TreeSet<Character>(allowedCharacters);
+		remaining.remove(guess);
+		for (Map.Entry<Set<Integer>, List<String>> block : splitByHitPattern(words, guess).entrySet()) {
+			int missCost = block.getKey().isEmpty() ? 1 : 0;
+			walk(block.getValue(), remaining, missesSoFar + missCost, strategy, missesPerWord);
+		}
 	}
 
-	/** 1-based positions of {@code letter} in {@code word}, as HangmanGame expects. */
-	private static int[] positionsOf(char letter, String word) {
-		List<Integer> places = new ArrayList<Integer>();
-		for (int i = 0; i < word.length(); i++) {
-			if (word.charAt(i) == letter) {
-				places.add(i + 1);
+	/**
+	 * Splits the words by the word-giver's answer for the guessed letter: the set
+	 * of positions where it occurs, the empty set meaning a miss.
+	 */
+	private static Map<Set<Integer>, List<String>> splitByHitPattern(List<String> words, char guess) {
+		Map<Set<Integer>, List<String>> blocks = new LinkedHashMap<Set<Integer>, List<String>>();
+		for (String word : words) {
+			Set<Integer> hitPattern = new HashSet<Integer>();
+			for (int i = 0; i < word.length(); i++) {
+				if (word.charAt(i) == guess) {
+					hitPattern.add(i);
+				}
 			}
+			List<String> block = blocks.get(hitPattern);
+			if (block == null) {
+				block = new LinkedList<String>();
+				blocks.put(hitPattern, block);
+			}
+			block.add(word);
 		}
-		int[] result = new int[places.size()];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = places.get(i);
-		}
-		return result;
+		return blocks;
 	}
 
-	private static String allowedLetters(List<String> words) {
-		TreeSet<Character> letters = new TreeSet<Character>();
+	private static Set<Character> lettersIn(List<String> words) {
+		Set<Character> letters = new TreeSet<Character>();
 		for (String word : words) {
 			for (char c : word.toCharArray()) {
 				letters.add(c);
 			}
 		}
+		return letters;
+	}
+
+	private static String asString(Set<Character> letters) {
 		StringBuilder sb = new StringBuilder();
 		for (char c : letters) {
 			sb.append(c);
@@ -115,28 +151,6 @@ public class Benchmark {
 		return sb.toString();
 	}
 
-	/**
-	 * Reproducible sample: all distinct lowercase words of the given length from
-	 * the resource, shuffled with the fixed seed, truncated to
-	 * {@value #SAMPLE_SIZE} and sorted.
-	 */
-	private static List<String> sampleWords(String resource, int length) throws Exception {
-		List<String> all = new ArrayList<String>();
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-				Benchmark.class.getResourceAsStream("/org/whatsoftwarecando/hangman/" + resource),
-				StandardCharsets.UTF_8))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				line = line.trim().toLowerCase();
-				if (line.length() == length && line.chars().allMatch(Character::isLetter)) {
-					all.add(line);
-				}
-			}
-		}
-		all = new ArrayList<String>(new TreeSet<String>(all));
-		Collections.shuffle(all, new Random(SEED));
-		List<String> sample = new ArrayList<String>(all.subList(0, Math.min(SAMPLE_SIZE, all.size())));
-		Collections.sort(sample);
-		return sample;
+	private Benchmark() {
 	}
 }
