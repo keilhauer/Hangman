@@ -4,12 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Purpose
 
-This project complements the blog article in the project root
-(`Warum-die-Greedy-Strategie-beim-Galgenraten-nicht-immer-gewinnt.txt`, "Why the
-greedy strategy doesn't always win at Hangman"). **Goal: every piece of code
-shown in the article must exist as Java code in this project** (the article's
-Python appendix has been ported as `GreedyCounterexample` +
-`BruteForceMiniMaxStrategy`).
+This project complements the blog article in the project root, present in a
+German original (`Warum-die-Greedy-Strategie-beim-Galgenraten-nicht-immer-gewinnt.txt`)
+and an English translation (`Why-the-Greedy-Strategy-Does-Not-Always-Win-at-Hangman.txt`),
+"Why the greedy strategy doesn't always win at Hangman". Both are in WordPress
+block format and must be kept in sync. **Goal: every piece of code shown in the
+article must exist as Java code in this project** (the article's Python appendix
+has been ported as `GreedyCounterexample` + `BruteForceMiniMaxStrategy`).
 
 ## Build & test
 
