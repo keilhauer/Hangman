@@ -36,6 +36,13 @@ import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepSizeReductionWithRis
 public class Benchmark {
 
 	private static final int LIVES = 6;
+	private static final int MIN_WORD_LENGTH = 5;
+
+	/**
+	 * Longest word length measured. Nine is where the story ends: the guesser
+	 * loses practically no games any more, so longer words add nothing.
+	 */
+	private static final int MAX_WORD_LENGTH = 9;
 
 	private static final String RESOURCE_PATH = "/org/whatsoftwarecando/hangman/";
 	private static final String[] WORDLIST_RESOURCES = { "word_list_german_uppercase_spell_checked.txt",
@@ -44,7 +51,7 @@ public class Benchmark {
 
 	public static void main(String[] args) {
 		for (int list = 0; list < WORDLIST_RESOURCES.length; list++) {
-			for (int length = 5; length <= 7; length++) {
+			for (int length = MIN_WORD_LENGTH; length <= MAX_WORD_LENGTH; length++) {
 				Wordlist dictionary = new Wordlist(
 						Benchmark.class.getResourceAsStream(RESOURCE_PATH + WORDLIST_RESOURCES[list]), length);
 				List<String> words = dictionary.getRemainingWords();
