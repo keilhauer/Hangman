@@ -14,14 +14,15 @@ import org.whatsoftwarecando.hangman.HangmanGame;
  * of misses the word-giver can force in the worst case, assuming perfect play
  * on both sides until the word is uniquely identified.
  *
- * In contrast to {@link MiniMaxOneStepStrategy} (the greedy heuristic, which
- * only looks half a move ahead), this strategy evaluates the complete game
- * tree. It is built on that strategy: it reuses the same driver
- * ({@link #bestGuess}) and block-splitting ({@link #splitByHitPattern}) and
- * only replaces the scoring ({@link #scoreGuess}). Instead of the size of the
- * biggest block after one guess it scores a guess by the worst case reached
- * after playing the whole game out. Its runtime is exponential in the size of
- * the wordlist, so it is only practical for small lists.
+ * In contrast to the one-step greedy strategies built on
+ * {@link MiniMaxOneStepStrategy}, which only look half a move ahead, this
+ * strategy evaluates the complete game tree. It is built on the same base: it
+ * reuses the driver ({@link #bestGuess}) and block-splitting
+ * ({@link #splitByHitPattern}) and only replaces the scoring
+ * ({@link #scoreGuess}). Instead of a one-step block measure it scores a guess
+ * by the worst case reached after playing the whole game out. Its runtime is
+ * exponential in the size of the wordlist, so it is only practical for small
+ * lists.
  */
 public class BruteForceMiniMaxStrategy extends MiniMaxOneStepStrategy {
 
@@ -33,16 +34,8 @@ public class BruteForceMiniMaxStrategy extends MiniMaxOneStepStrategy {
 		return worstCaseMisses(blocks, remainingCharacters, cache);
 	}
 
-	/**
-	 * Full look-ahead already accounts for every miss, so this strategy needs
-	 * no miss-avoidance tie-break: among guesses with equal forced misses it
-	 * keeps the first (lowest) letter. Overrides the one-step tie-break, which
-	 * would otherwise prefer a different letter here.
-	 */
-	@Override
-	protected int tieBreak(Map<Set<Integer>, List<String>> blocks) {
-		return 0;
-	}
+	// No tie-break override: full look-ahead already accounts for every miss, so
+	// the base default (no tie-break, first letter wins) is exactly what we want.
 
 	/**
 	 * Number of misses the word-giver can force in the worst case if both

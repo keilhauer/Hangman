@@ -3,14 +3,14 @@ package org.whatsoftwarecando.hangman;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
-import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepStrategy;
+import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy;
 
 /**
  * Interactive helper for the guessing side of a real Hangman game: after each
  * round the player enters the word-giver's answer (the guessed letter followed
  * by its 1-based positions, or the letter alone for a miss), and the helper
  * narrows the candidate word list and suggests the next guess using the greedy
- * {@link MiniMaxOneStepStrategy}.
+ * {@link MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy}.
  *
  * Expects two arguments: the name of a word list resource (see the
  * {@code .launch} files in the project root) and the characters that may be
@@ -61,7 +61,7 @@ public class HangmanHelper {
 		Wordlist wordlist = new Wordlist(HangmanHelper.class.getResourceAsStream(wordlistFilename), anzahlBuchstaben);
 
 		HangmanGame hangmanGame = new HangmanGame(wordlist, allowedCharactersForGuesses,
-				new MiniMaxOneStepStrategy());
+				new MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy());
 		System.out
 				.println("\n" + wordlist.getRemainingWords().size() + " words with " + anzahlBuchstaben
 						+ " letters loaded.");

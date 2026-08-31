@@ -15,23 +15,27 @@ import org.whatsoftwarecando.hangman.IGuessingStrategy;
 import org.whatsoftwarecando.hangman.Wordlist;
 
 /**
- * One-step (half-a-move) minimax with risk avoidance. It first minimizes the
- * risk of a miss - the number of remaining words that do not contain the
- * guessed letter ({@link #scoreGuess}) - and, among equally safe letters,
- * minimizes the size of the biggest remaining block ({@link #tieBreak}).
+ * Abstract base of the one-step (half-a-move) minimax strategies. It provides
+ * the shared driver ({@link #bestGuess}): enumerate the allowed letters, split
+ * the remaining words into the blocks the word-giver's answer would create, and
+ * pick the letter whose blocks score best. Concrete strategies differ only in
+ * how a guess is scored ({@link #scoreGuess}, primary) and how ties are broken
+ * ({@link #tieBreak}, secondary); both criteria are computed from the two block
+ * measures {@link #biggestBlock} and {@link #missBlock}:
  *
- * <p>NOTE: this differs from the pure greedy of the article, which minimizes
- * only the biggest block regardless of miss risk.
+ * <ul>
+ * <li>{@link MiniMaxOneStepSizeReductionStrategy} - minimize the biggest block
+ * (the article's greedy), no risk consideration.</li>
+ * <li>{@link MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy} - minimize
+ * the biggest block, and among equally good letters prefer a riskless one.</li>
+ * <li>{@link MiniMaxOneStepSafetyStrategy} - minimize the risk of a miss first,
+ * and among equally safe letters minimize the biggest block.</li>
+ * </ul>
  *
- * <p>This class also serves as the base for {@link BruteForceMiniMaxStrategy},
- * which looks all the way to the end of the game instead of a single step. Both
- * share the same driver ({@link #bestGuess}): enumerate the allowed letters,
- * split the remaining words into the blocks the word-giver's answer would
- * create, and pick the letter whose blocks score best. They differ only in how
- * a guess is scored ({@link #scoreGuess}) - one step versus n steps of
- * look-ahead - and how ties are broken ({@link #tieBreak}).
+ * {@link BruteForceMiniMaxStrategy} is built on the same driver but replaces
+ * the one-step {@link #scoreGuess} with a full n-step look-ahead.
  */
-public class MiniMaxOneStepStrategy implements IGuessingStrategy {
+public abstract class MiniMaxOneStepStrategy implements IGuessingStrategy {
 
 	@Override
 	public Character bestGuess(HangmanGame hangManGame) {
@@ -58,41 +62,40 @@ public class MiniMaxOneStepStrategy implements IGuessingStrategy {
 	}
 
 	/**
-	 * Scores a guess for {@link #bestGuess}; lower is better. This risk-averse
-	 * one-step strategy scores by the size of the miss block (the remaining
-	 * words that do not contain the letter): a letter that cannot cause a miss
-	 * scores 0 and is preferred. {@link BruteForceMiniMaxStrategy} overrides it
-	 * with a full game-tree look-ahead.
+	 * Scores a guess for {@link #bestGuess}; lower is better. The one-step
+	 * strategies return either {@link #biggestBlock} or {@link #missBlock};
+	 * {@link BruteForceMiniMaxStrategy} returns a full game-tree look-ahead.
 	 *
 	 * @param cache
 	 *            per-call memoization table offered to deeper look-ahead;
 	 *            unused by the one-step scoring.
 	 */
-	protected int scoreGuess(HangmanGame hangManGame, char guess, Map<Set<Integer>, List<String>> blocks,
-			Map<String, Integer> cache) {
-		return missBlock(blocks);
-	}
+	protected abstract int scoreGuess(HangmanGame hangManGame, char guess, Map<Set<Integer>, List<String>> blocks,
+			Map<String, Integer> cache);
 
 	/**
 	 * Tie-breaker among guesses that share the same {@link #scoreGuess}; the
-	 * lowest value wins. Among equally safe letters this one-step strategy
-	 * prefers the one that shrinks the biggest block the most (see
-	 * {@link #biggestBlockAfterGuess}). {@link BruteForceMiniMaxStrategy}
-	 * overrides this: its full look-ahead already accounts for misses.
+	 * lowest value wins. The default breaks no ties (so the first letter in
+	 * alphabetical order wins); subclasses override it with {@link #biggestBlock}
+	 * or {@link #missBlock}.
 	 */
 	protected int tieBreak(Map<Set<Integer>, List<String>> blocks) {
-		return biggestBlock(blocks);
+		return 0;
 	}
 
 	/**
 	 * Size of the biggest block of words that can remain after guessing the
-	 * given character - the criterion this strategy minimizes.
+	 * given character - the criterion the size-reduction strategies minimize.
 	 */
 	public int biggestBlockAfterGuess(char guess, Wordlist wordlist) {
 		return biggestBlock(splitByHitPattern(wordlist.getRemainingWords(), guess));
 	}
 
-	private int biggestBlock(Map<Set<Integer>, List<String>> blocks) {
+	/**
+	 * Size of the biggest block: the worst-case number of words still lumped
+	 * together after the guess.
+	 */
+	protected int biggestBlock(Map<Set<Integer>, List<String>> blocks) {
 		int biggest = 0;
 		for (List<String> block : blocks.values()) {
 			if (block.size() > biggest) {
@@ -108,7 +111,7 @@ public class MiniMaxOneStepStrategy implements IGuessingStrategy {
 	 * and hence cannot cause a miss. The miss block is the one keyed by the
 	 * empty hit pattern.
 	 */
-	private int missBlock(Map<Set<Integer>, List<String>> blocks) {
+	protected int missBlock(Map<Set<Integer>, List<String>> blocks) {
 		List<String> missBlock = blocks.get(Collections.<Integer>emptySet());
 		return missBlock == null ? 0 : missBlock.size();
 	}
@@ -117,7 +120,7 @@ public class MiniMaxOneStepStrategy implements IGuessingStrategy {
 	 * Splits the words by the answer the word-giver would have to give for the
 	 * guessed letter: the set of positions where the letter occurs. The empty
 	 * set means the guess is a miss. This is the partition into "blocks" the
-	 * article describes, and the shared primitive of both strategies.
+	 * article describes, and the shared primitive of all strategies.
 	 */
 	protected Map<Set<Integer>, List<String>> splitByHitPattern(List<String> words, char guess) {
 		Map<Set<Integer>, List<String>> blocks = new LinkedHashMap<Set<Integer>, List<String>>();

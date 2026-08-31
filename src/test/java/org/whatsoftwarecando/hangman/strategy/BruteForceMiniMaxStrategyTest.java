@@ -25,7 +25,7 @@ public class BruteForceMiniMaxStrategyTest {
 	@Test
 	public void greedyChoosesS() {
 		HangmanGame game = new HangmanGame(GreedyCounterexample.createWordlist(WORDS), ALLOWED,
-				new MiniMaxOneStepStrategy());
+				new MiniMaxOneStepSafetyStrategy());
 		assertEquals(Character.valueOf('s'), game.bestGuess());
 	}
 
@@ -38,7 +38,7 @@ public class BruteForceMiniMaxStrategyTest {
 
 	@Test
 	public void biggestBlocksMatchArticleTable() {
-		MiniMaxOneStepStrategy greedy = new MiniMaxOneStepStrategy();
+		MiniMaxOneStepSafetyStrategy greedy = new MiniMaxOneStepSafetyStrategy();
 		assertEquals(2, greedy.biggestBlockAfterGuess('s', GreedyCounterexample.createWordlist(WORDS)));
 		assertEquals(3, greedy.biggestBlockAfterGuess('a', GreedyCounterexample.createWordlist(WORDS)));
 		assertEquals(3, greedy.biggestBlockAfterGuess('t', GreedyCounterexample.createWordlist(WORDS)));

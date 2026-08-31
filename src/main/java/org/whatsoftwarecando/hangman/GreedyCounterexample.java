@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.whatsoftwarecando.hangman.strategy.BruteForceMiniMaxStrategy;
-import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepStrategy;
+import org.whatsoftwarecando.hangman.strategy.MiniMaxOneStepSafetyStrategy;
 
 /**
  * Verifies the counterexample from the blog article "Warum die
@@ -46,7 +46,7 @@ public class GreedyCounterexample {
 
 		Set<Character> letters = lettersIn(WORDS);
 		Wordlist wordlist = createWordlist(WORDS);
-		MiniMaxOneStepStrategy greedy = new MiniMaxOneStepStrategy();
+		MiniMaxOneStepSafetyStrategy greedy = new MiniMaxOneStepSafetyStrategy();
 		BruteForceMiniMaxStrategy bruteForce = new BruteForceMiniMaxStrategy();
 
 		for (Character currentChar : letters) {
