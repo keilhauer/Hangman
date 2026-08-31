@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Purpose
 
 This project complements the blog article in the project root
-(`warum-die-greedy-strategie-bei-hangman-nicht-immer-gewinnt.md.pdf`, "Why the
+(`Warum-die-Greedy-Strategie-beim-Galgenraten-nicht-immer-gewinnt.txt`, "Why the
 greedy strategy doesn't always win at Hangman"). **Goal: every piece of code
 shown in the article must exist as Java code in this project** (the article's
 Python appendix has been ported as `GreedyCounterexample` +
@@ -58,6 +58,10 @@ Tests need a JUnit 4 + Hamcrest jar on the classpath (e.g. from
   miss). Output text comes from `messages[_de].properties` (English default;
   pass `de` as the first arg for the German article). `BruteForceMiniMaxStrategyTest`
   pins its numbers; each greedy strategy also has its own `*Test`
+- `Benchmark` — main that reproduces the article's average-misses and
+  lost-games tables: plays each greedy strategy against a fixed, seeded
+  1000-word sample per word length; the fixed RNG seed keeps the published
+  numbers reproducible
 - Each greedy strategy has a unit test in `strategy/` (shared helper
   `StrategyTestSupport`); the tests use discriminating word sets so a test
   fails if a strategy's criteria or their order are swapped
