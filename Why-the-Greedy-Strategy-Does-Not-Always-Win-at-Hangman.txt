@@ -23,11 +23,11 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>From this, three natural strategies arise: minimize only the biggest block; minimize the biggest block and, in case of a tie, take the safer letter; or, conversely, go for safety first and bring in block size only for equally safe letters. All three are in my little Hangman project on GitHub as <code>MiniMaxOneStepSizeReductionStrategy</code>, <code>MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy</code> and <code>MiniMaxOneStepSafetyStrategy</code>. They share the same procedure and differ only in two methods: how a move is scored and how ties are resolved.</p>
+<p>From this, three natural strategies arise: minimize only the biggest block; minimize the biggest block and, in case of a tie, take the safer letter; or, conversely, go for safety first and bring in block size only for equally safe letters. All three are in my little <a href="https://github.com/keilhauer/Hangman/">Hangman project on GitHub</a> as <code>MiniMaxOneStepSizeReductionStrategy</code>, <code>MiniMaxOneStepSizeReductionWithRiskAvoidanceStrategy</code> and <code>MiniMaxOneStepSafetyStrategy</code>. They share the same procedure and differ only in two methods: how a move is scored and how ties are resolved.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>This is a classic greedy algorithm: at every move it does the locally best thing without thinking further ahead. To be technically precise, one could also call it one-step minimax, since a minimax really is computed – but only one level deep in the search tree. On real dictionaries it performs well, as we will see with numbers in a moment. It is not an optimal strategy nonetheless.</p>
+<p>This is a classic <a href="https://en.wikipedia.org/wiki/Greedy_algorithm">greedy algorithm</a>: at every move it does the locally best thing without thinking further ahead. To be technically precise, one could also call it one-step minimax, since a <a href="https://en.wikipedia.org/wiki/Minimax">minimax</a> really is computed – but only one level deep in the search tree. On real dictionaries it performs well, as we will see with numbers in a moment. It is not an optimal strategy nonetheless.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -89,7 +89,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Hangman is, after all, a decision tree, and whoever plays optimally minimizes the wrong guesses along the entire tree, not merely the risk and the block size of the next move. A strategy that looks only one step ahead is, in principle, unable to see these traps.</p>
+<p>Hangman is, after all, a <a href="https://en.wikipedia.org/wiki/Decision_tree">decision tree</a>, and whoever plays optimally minimizes the wrong guesses along the entire tree, not merely the risk and the block size of the next move. A strategy that looks only one step ahead is, in principle, unable to see these traps.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -121,11 +121,11 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>And yet: on our five words all three reach for the same losing s. The two other usual suspects change nothing about that either. Whoever minimizes the expected remaining block size arrives at 1.4 words for s and at least 2.6 for all others. And whoever goes by the greatest information gain – i.e. the criterion that maximizes the entropy of the split – gets the same result, because s splits the list most finely. This is no accident: all these criteria evaluate only how the word list falls apart now, and none asks whether the resulting blocks can still be resolved safely later.</p>
+<p>And yet: on our five words all three reach for the same losing s. The two other usual suspects change nothing about that either. Whoever minimizes the expected remaining block size arrives at 1.4 words for s and at least 2.6 for all others. And whoever goes by the greatest information gain – i.e. the criterion that maximizes the <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">entropy</a> of the split – gets the same result, because s splits the list most finely. This is no accident: all these criteria evaluate only how the word list falls apart now, and none asks whether the resulting blocks can still be resolved safely later.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>But that wasn't all. One can show that no efficient rule solves this problem at all, no matter how sophisticated. The argument is pleasantly short: every greedy heuristic – and every fixed-depth lookahead too – is a deterministic procedure with polynomial running time. For such a procedure its worst case can itself be computed efficiently: you simply simulate the game once for every word of the list and count the wrong guesses. So if there were an efficient strategy that always plays optimally, you could use it to decide efficiently whether a win with a given number of wrong guesses can be guaranteed. But exactly this question is NP-hard, as we will see shortly. Under the usual assumption P ≠ NP there can therefore be no always-perfect greedy rule. Our counterexample shows this for concrete greedy strategies and thereby finishes them off for good, because against the claim "greedy always wins" a single word list suffices. What it cannot do is make a statement about rules nobody has written down yet. That is exactly where complexity theory comes in: it hits all efficient procedures at once.</p>
+<p>But that wasn't all. One can show that no efficient rule solves this problem at all, no matter how sophisticated. The argument is pleasantly short: every greedy heuristic – and every fixed-depth lookahead too – is a deterministic procedure with polynomial running time. For such a procedure its worst case can itself be computed efficiently: you simply simulate the game once for every word of the list and count the wrong guesses. So if there were an efficient strategy that always plays optimally, you could use it to decide efficiently whether a win with a given number of wrong guesses can be guaranteed. But exactly this question is NP-hard, as we will see shortly. Under the usual assumption <a href="https://en.wikipedia.org/wiki/P_versus_NP_problem">P ≠ NP</a> there can therefore be no always-perfect greedy rule. Our counterexample shows this for concrete greedy strategies and thereby finishes them off for good, because against the claim "greedy always wins" a single word list suffices. What it cannot do is make a statement about rules nobody has written down yet. That is exactly where complexity theory comes in: it hits all efficient procedures at once.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -145,7 +145,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Their main result: deciding whether the word-giver can force a certain number of wrong guesses is coNP-hard. This already holds for finite word lists with word length 4. From the guesser's point of view this is equivalent to the question "Is there a strategy that surely guesses every word with fewer than d wrong guesses?" being NP-hard. The proof reduces the dominating set problem on 3-regular graphs to Hangman: each node of the graph becomes a letter, and for each node a four-letter word is formed from its own letter and those of its three neighbors. A dominating set of size at most d then exists if and only if the guesser always wins with at most d − 1 misses: they query the d letters of the dominating set, at least one must hit, and a single hit already identifies the word uniquely thanks to the construction.</p>
+<p>Their main result: deciding whether the word-giver can force a certain number of wrong guesses is coNP-hard. This already holds for finite word lists with word length 4. From the guesser's point of view this is equivalent to the question "Is there a strategy that surely guesses every word with fewer than d wrong guesses?" being <a href="https://en.wikipedia.org/wiki/NP-hardness">NP-hard</a>. The proof reduces the <a href="https://en.wikipedia.org/wiki/Dominating_set">dominating set problem</a> on 3-regular graphs to Hangman: each node of the graph becomes a letter, and for each node a four-letter word is formed from its own letter and those of its three neighbors. A dominating set of size at most d then exists if and only if the guesser always wins with at most d − 1 misses: they query the d letters of the dominating set, at least one must hit, and a single hit already identifies the word uniquely thanks to the construction.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->
@@ -161,7 +161,7 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Whoever doesn't trust the counterexample (quite rightly – trust is good, brute force is better) will find everything to verify in my Hangman project on GitHub (Java, open source). The opponents of this article face off there as classes: the three one-step variants derive from <code>MiniMaxOneStepStrategy</code>, <code>BruteForceMiniMaxStrategy</code> uses the same procedure but replaces the one-step evaluation with the full game depth – with exponential running time, of course, but on five words in milliseconds. The class <code>GreedyCounterexample</code> sets both sides loose on this article's word list and, for each informative first letter, prints greedy's criterion as well as the misses the word-giver can force (c, h and e are absent because they sit at the same positions in all five words and therefore reveal nothing):</p>
+<p>Whoever doesn't trust the counterexample (quite rightly – trust is good, brute force is better) will find everything to verify in my <a href="https://github.com/keilhauer/Hangman/">Hangman project on GitHub</a> (Java, open source). The opponents of this article face off there as classes: the three one-step variants derive from <code>MiniMaxOneStepStrategy</code>, <code>BruteForceMiniMaxStrategy</code> uses the same procedure but replaces the one-step evaluation with the full game depth – with exponential running time, of course, but on five words in milliseconds. The class <code>GreedyCounterexample</code> sets both sides loose on this article's word list and, for each informative first letter, prints greedy's criterion as well as the misses the word-giver can force (c, h and e are absent because they sit at the same positions in all five words and therefore reveal nothing):</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:code -->
